@@ -1,0 +1,102 @@
+@charset "utf-8";
+
+/*出現のアニメーション設定。opacityは透明度の事です。*/
+@keyframes menu1 {
+
+0% {opacity: 0;}
+100% {opacity: 1;}
+
+}
+
+/*トップページのメニューブロック
+---------------------------------------------------------------------------*/
+/*トップページのメニュー１個あたりの設定*/
+#menubar-top li a {
+	text-decoration: none;
+	display: block;
+	border: 5px solid #fff;	/*枠線の幅、選手、色*/
+	border-radius: 50%;	/*角丸のサイズ*/
+	width: 150px;		/*メニューの幅*/
+	line-height: 150px;	/*メニューの高さ*/
+	text-align: center;	/*文字を中央に*/
+	color: #fff;		/*文字色*/
+}
+/*マウスオン時*/
+#menubar-top li a:hover {
+	color: #fff;	/*文字色*/
+	box-shadow: 0px 0px 100px #fff;	/*ボックスの影。右へ、左へ、広げる幅、色。*/
+}
+/*５個のメニュー共通*/
+#menubar-top li#menu1,#menubar-top li#menu2,#menubar-top li#menu3,#menubar-top li#menu4,#menubar-top li#menu5 {
+	animation-name: menu1;		/*上のアニメーションで指定しているkeyframesの名前（logo）*/
+	animation-duration: 3S;		/*アニメーションの実行時間*/
+	animation-fill-mode: both;	/*アニメーションの完了後、最後のキーフレームを維持する*/
+}
+/*メニュー１つ目（HOME）*/
+#menubar-top li#menu1 {
+	position: absolute;
+	left: 33%;	/*左から33%の場所に配置*/
+	top: 4%;	/*上から4%の場所に配置*/
+}
+/*メニュー２つ目（COMPANY）*/
+#menubar-top li#menu2 {
+	position: absolute;
+	left: 8%;	/*左から8%の場所に配置*/
+	top: 35%;	/*上から35%の場所に配置*/
+	animation-delay: 0.2s;	/*0.2秒だけ遅れてアニメーションをスタートさせる設定*/
+}
+/*メニュー３つ目（SERVICE）*/
+#menubar-top li#menu3 {
+	position: absolute;
+	left: 36%;	/*左から36%の場所に配置*/
+	bottom: 8%;	/*下から8%の場所に配置*/
+	animation-delay: 0.4s;	/*0.4秒だけ遅れてアニメーションをスタートさせる設定*/
+}
+/*メニュー４つ目（LINK）*/
+#menubar-top li#menu4 {
+	position: absolute;
+	right: 8%;		/*右から8%の場所に配置*/
+	bottom: 27%;	/*下から27%の場所に配置*/
+	animation-delay: 0.6s;	/*0.6秒だけ遅れてアニメーションをスタートさせる設定*/
+}
+/*メニュー５つ目（CONTACT）*/
+#menubar-top li#menu5 {
+	position: absolute;
+	right: 15%;	/*右から15%の場所に配置*/
+	top: 18%;	/*上から18%の場所に配置*/
+	animation-delay: 0.8s;	/*0.8秒だけ遅れてアニメーションをスタートさせる設定*/
+}
+
+
+
+/*画面幅800px以下、または、画面の高さ800px以下の場合の設定
+------------------------------------------------------------------------------------------------------------------------------------------------------*/
+@media screen and (max-width: 800px), screen and (max-height:800px) {
+
+/*トップページのメニューブロック
+---------------------------------------------------------------------------*/
+/*トップページのメニュー１個あたりの設定*/
+#menubar-top li a {
+	width: 120px;		/*メニューの幅*/
+	line-height: 120px;	/*メニューの高さ*/
+	font-size: 12px;
+}
+
+}
+
+
+
+/*画面幅500px以下、または、画面の高さ500px以下の場合の設定
+------------------------------------------------------------------------------------------------------------------------------------------------------*/
+@media screen and (max-width: 500px), screen and (max-height:500px) {
+
+/*トップページのメニューブロック
+---------------------------------------------------------------------------*/
+/*トップページのメニュー１個あたりの設定*/
+#menubar-top li a {
+	width: 90px;		/*メニューの幅*/
+	line-height: 90px;	/*メニューの高さ*/
+	font-size: 10px;
+}
+
+}

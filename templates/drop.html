@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <style>
+        body {
+            min-height: 100vh;
+        }
+
+        #ddarea {
+            width: 200px;
+            height: 150px;
+            border: 1px dotted #888;
+            margin: 1em auto;
+        }
+    </style>
+    <script>
+        window.onload = () => {
+            const ddarea = document.getElementById("ddarea");
+            const list = document.getElementById("list");
+            ddarea.addEventListener("dragover", dragover);
+            document.body.addEventListener("dragover", dragover)
+            ddarea.addEventListener("dragleave", dragleave)
+            document.body.addEventListener("dragleave", dragleave)
+            ddarea.addEventListener("drop", drop)
+            document.body.addEventListener("drop", drop)
+            function dragover(event) {
+                event.preventDefault();
+                if (!event.currentTarget.isEqualNode(ddarea)) {
+                    event.dataTransfer.dropEffect = "none";
+                } else {
+                    event.stopPropagation();
+                    if (event.dataTransfer.types.indexOf("Files") < 0) {
+                        event.dataTransfer.dropEffect = "none";
+                    } else {
+                        event.dataTransfer.dropEffect = "copy";
+                    }
+                }
+            }
+            function dragleave(event) {
+                if (event.currentTarget.isEqualNode(ddarea)) {
+                    event.stopPropagation(); // イベント伝播を止める
+                }
+            }
+            function drop(event) {
+                event.preventDefault(); // 既定の処理をさせない
+                event.stopPropagation(); // イベント伝播を止める
+                const files = event.dataTransfer.files;
+                let text = ""
+                text += `${files.length}のファイルがドロップされた。\n`;
+                for (const file of files) text += `name:${file.name} type:${file.type}\n`;
+                list.innerText = text
+            }
+        }
+    </script>
+    <div id="ddarea">
+        <p>ここにドロップ</p>
+    </div>
+    <div id="list"></div>
+</body>
+
+</html>

@@ -1,0 +1,239 @@
+@font-face {
+	font-family: 'GenshinFont';
+	src: url(/font/genshin.ttf);
+    }
+
+@font-face {
+    font-family: google;
+    src: url( /font/catull-regular.woff);
+}
+@font-face {
+    font-family: amazon;
+    src: url(/font/Amazon-Ember-Medium.ttf);
+}
+
+
+#timer{
+    color: rgb(255, 0, 0);
+    font-size: 150px;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}
+
+#name111{
+    display: inline-block;
+    width: 80%;
+    padding: 20px;
+    border: 0.2vmin solid rgb(47, 0, 255);
+    box-sizing: border-box;
+    background: #c3c3c3;
+    margin: 5vmin 0;
+    position: absolute;
+    font-size: 20px;
+    top: 48%;
+    left: 10%;
+
+}
+
+a{
+    position: absolute;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    font-size: 30px;
+}
+
+@media(max-width:1020px) {
+    a{
+        font-size: larger;
+    }
+
+}
+
+@media(max-width:550px) {
+    a{
+        font-size: small;
+    }
+
+}
+
+#YMD{
+    position: absolute;
+    top:30px;
+    right: 10px;
+    font-size: 30px;
+}
+#youtube{
+    top: 70%;
+    left: 20%;
+}
+#amazon{
+    font-family: amazon;
+    top: 70%;
+    left: 50%;
+}
+#eemetro{
+    top: 70%;
+    left: 80%;
+}
+#sssumaa{
+    top: 85%;
+    left: 20%;
+}
+#metro{
+    top: 85%;
+    left: 80%;
+}
+
+#suugle{
+    font-family: google;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    width: 20vmin;
+    height: auto;
+
+}
+
+#genshin{
+    font-family: GenshinFont;
+    top: 85%;
+    left: 50%;
+}
+#wea{
+    position: absolute;
+    top: 800px;
+    left: 0%;
+    width: 100%;
+}
+#nowweather{
+    width: 400px;
+    height: 100px;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    border: 0.2vmin solid rgb(47, 0, 255);
+    margin: 0% 0;
+    font-size: 2vmin;
+}
+#city{
+    position: absolute;
+    top: 0%;
+    left: 80%;
+}
+#todaydes{
+    position: absolute;
+    top: 5%;
+    left: 10%;
+    font-size: 3vmin;
+}
+#temp{
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    font-size: 4vmin;
+}
+#pre{
+    position: absolute;
+    top: 30%;
+    left: 70%;
+    font-size: 1.5vmin;
+}
+#hum{
+    position: absolute;
+    top: 50%;
+    left: 70%;
+    font-size: 1.5vmin;
+}
+#speed{
+    position: absolute;
+    top: 70%;
+    left: 70%;
+    font-size: 1.5vmin;
+}
+
+
+.date{
+    font-size: 20px;
+    
+}
+.description{
+    font-size: 15px;
+}
+.temp_max{
+    font-size: 10px;
+}
+.temp_min{
+    font-size: 10px;
+}
+
+#wha0 {
+    color: rgb(0, 0, 0);
+    position: absolute;
+    width: 10%;
+    height: 70px;
+    top: 100px;
+    left: 15%;
+}
+#wha1 {
+    color: rgb(0, 0, 0);
+    position: absolute;
+    width: 10%;
+    height: 70px;
+    top: 100px;
+    left: 25%;
+}
+
+#wha2 {
+    color: rgb(0, 0, 0);
+    position: absolute;
+    width: 10%;
+    height: 70px;
+    top: 100px;
+    left: 35%;
+}
+#wha3 {
+    color: rgb(0, 0, 0);
+    position: absolute;
+    width: 10%;
+    height: 70px;
+    top: 100px;
+    left: 45%;
+}
+#wha4 {
+    color: rgb(0, 0, 0);
+    position: absolute;
+    width: 10%;
+    height: 70px;
+    top: 100px;
+    left: 55%;
+}
+#wha5 {
+    color: rgb(0, 0, 0);
+    position: absolute;
+    width: 10%;
+    height: 70px;
+    top: 100px;
+    left: 65%;
+}
+#wha6 {
+    color: rgb(0, 0, 0);
+    position: absolute;
+    width: 10%;
+    height: 70px;
+    top: 100px;
+    left: 75%;
+}
+
+
+h4{
+    text-align: center;
+
+}

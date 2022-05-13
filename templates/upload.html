@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>sumaaのWEBサイト</title>
+    <link rel="shortcut icon" href="/icon.jpeg" type="image/png">
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+</head>
+
+<body>
+    <style>
+        #progress_bar {
+            margin: 10px 0;
+            padding: 3px;
+            border: 1px solid #000;
+            font-size: 14px;
+            clear: both;
+            opacity: 0;
+        }
+
+        #progress_bar.loading {
+            opacity: 1.0;
+        }
+
+        #progress_bar .percent {
+            background-color: #ff9999;
+            height: auto;
+            width: 0;
+        }
+    </style>
+    <form action="POST">
+        <progress value="0" max="100"></progress>
+        <input type="file" name="file" id="file">
+        <button type="button" id="post">upload</button>
+    </form>
+    <script>
+        function updateProgress(e) {
+            if (e.lengthComputable) {
+                const percent = e.loaded / e.total;
+                $("progress").attr("value", percent * 100);
+            }
+
+        }
+        $("#post").on("click", function () {
+            const formData = new FormData();
+            formData.append("file", document.getElementById("file").files[0]);
+            const request = new XMLHttpRequest();
+            request.upload.addEventListener("progress", updateProgress, false);
+            request.open("POST", "/put");
+            request.overrideMimeType('file; charset=UTF-8');
+            request.send(formData);
+            request.onload = function () {
+                alert("アップロードが完了しました")
+                location.reload()
+            }
+            request.onerror = function () {
+                alert("アップロードに失敗しました")
+            }
+        });
+    </script>
+    <form action="/">
+        <button type="submit">戻る</button>
+    </form>
+
+</body>
+
+</html>
