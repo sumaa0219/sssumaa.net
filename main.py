@@ -50,12 +50,17 @@ lon = "139.69167"
 # def index():
 #     return "Hello, %s!" % auth.username()
 
-@app.route(
-    "/.well-known"
-    "/acme-challenge"
-    "/zh4jSTFqq8J7JPU5U1kxob_XhhpXMtP6hy9GqeIAryE")
-def acme_challenge():
-    return "zh4jSTFqq8J7JPU5U1kxob_XhhpXMtP6hy9GqeIAryE"
+@app.before_request
+def before_request():
+    if not request.is_secure and app.env != 'development':
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
+
+
+@app.route('/.well-known/acme-challenge/<filename>')
+def well_known(filename):
+    return render_template('.well-known/acme-challenge/'+ filename)
 
 
 @app.route("/")
@@ -80,6 +85,7 @@ def GfN(st):
 @app.route("/download")
 def download():
     filename = os.listdir(path=app.config['UPLOAD_FOLDER'])
+    filename.sort()
     filekey = list(range(len(filename)))
     return render_template("download.html", data=zip(filename, filekey))
 
@@ -127,4 +133,7 @@ if __name__ == '__main__':
     
 
 
-    app.run(host="0.0.0.0",debug=True,threaded=True)
+    app.run(host="0.0.0.0",ssl_context=('/etc/letsencrypt/live/sssumaa.net/fullchain.pem', '/etc/letsencrypt/live/sssumaa.net/privkey.pem'),debug=True,threaded=True)
+
+
+# sumaa@raspberrypi:~/Desktop/api $ sudo certbot certonly --webroot -w /home/sumaa/Desktop/api/templates/ -d sssumaa.net

@@ -15,8 +15,9 @@
 
 <body>
     <h1 style="color: rgb(4, 255, 79);">ファイル保管庫</h1>
+    
     {% for name, key in data %}
-    <a href="/drive/{{name}}" download>{{ name }}</a>
+    <a href="/drive/{{name}}" download id="{{name}}">{{ name }}</a>
     <button id="{{key}}"> delete </button><br><br>
     <script>
         $("#{{key}}").click(function () {
@@ -31,6 +32,7 @@
         })
     </script>
     {% endfor %}
+    
     <a href="/">戻る</a><br>
 </body>
 
