@@ -1,12 +1,19 @@
+from crypt import methods
 from email.mime.text import MIMEText
+from itertools import count
+from tkinter import E
 from flask.helpers import url_for
+import csv
 import os
+import os.path
 from flask import Flask,render_template,request,redirect,Blueprint,jsonify
+from numpy import count_nonzero, number
 from werkzeug.utils import secure_filename
 import requests
 import json
 from datetime import datetime, timezone, timedelta
 import locale
+import psutil 
 # from flask_httpauth import HTTPBasicAuth
 app = Flask(__name__, static_folder='static',static_url_path="")
 # auth = HTTPBasicAuth()
@@ -18,12 +25,15 @@ app.register_blueprint(add_app)
 
 UPLOAD_FOLDER = '/mnt/ex-ssd/datefile/' #ここに絶対パス
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['JSON_AS_ASCII'] = False
 
 
 wetherapikey = "80efcb09546b956c8fa14024be0cd5fa"
 
-lat = "35.68944"
-lon = "139.69167"
+lat = "42.2128"
+lon = "-71.0342"
+
+
 
 
 
@@ -74,8 +84,18 @@ def GfNindex():
 
 @app.route("/top")
 def top():
+    number=[1,2,3,4,5,6]
+    name=[]
+    date=[]
+    csv_file = open("/home/sumaa/Desktop/api/static/date/favorite.csv", "r", encoding="UTF-8", errors="", newline="" )
+    f = csv.reader(csv_file, delimiter=",", doublequote=True, lineterminator="\r\n", quotechar='"', skipinitialspace=True)
 
-    return render_template("top.html")
+    for row in f:
+        name.append(row[0])
+        date.append(row[1])
+        print(row)
+
+    return render_template("top.html",data=zip(number,name,date))
 
 @app.route("/GfN/<string:st>")
 def GfN(st):
@@ -84,10 +104,42 @@ def GfN(st):
 
 @app.route("/download")
 def download():
+    list_ext=[]
+    list_size=[]
+    list_date=[]
     filename = os.listdir(path=app.config['UPLOAD_FOLDER'])
     filename.sort()
+    count=len(filename)
+    for x in range(count):
+        ext = filename[x].find('.')
+        size = os.path.getsize(UPLOAD_FOLDER + filename[x])
+        time = os.path.getctime(UPLOAD_FOLDER + filename[x])
+        list_ext.append(filename[x][ext+1:].lower())
+
+        if size >= 1000000000000:
+            size = size/1000000000000
+            sizeB =str(size)+"TB"
+
+        elif size >= 1000000000:
+            size = size/1000000000
+            sizeB =str(size)+"GB"
+
+        elif size >= 1000000:
+            size = size/1000000
+            sizeB =str(size)+"MB"
+
+        elif size >= 1000:
+            size = size/1000
+            sizeB =str(size)+"KB"
+
+        else:
+            sizeB =str(size)+"B"
+
+        list_date.append(unixJST(time))
+        list_size.append(sizeB)
+
     filekey = list(range(len(filename)))
-    return render_template("download.html", data=zip(filename, filekey))
+    return render_template("download.html", data=zip(filename, list_ext,list_size,list_date, filekey))
 
 
 @app.route("/upload")
@@ -101,6 +153,58 @@ def put():
     putName = secure_filename(putFile.filename)
     putFile.save(os.path.join(app.config['UPLOAD_FOLDER'], putName))
     return jsonify()
+
+@app.route("/register", methods=["POST"])
+def register():
+    favorite=[]
+    regiword: str = request.form["word"]
+    reginame: str = request.form["name"]
+    regiID: int = request.form["id"]
+    ID= int(regiID)-1
+    print(reginame)
+    print(regiword)
+    # with open("static/date/favorite.csv") as f:
+    #     list = f.readlines
+    # list[regiID-1] = regiword
+    csv_file = open("/home/sumaa/Desktop/api/static/date/favorite.csv", "r", encoding="UTF-8", errors="", newline="" )
+    f = csv.reader(csv_file, delimiter=",", doublequote=True, lineterminator="\r\n", quotechar='"', skipinitialspace=True)
+
+
+    count = 0
+    for row in f:
+        if ID == count:
+            favorite.append([reginame,regiword])
+        else:
+            favorite.append(row)
+        count += 1
+
+    csv_file.close()
+
+
+    e = open("/home/sumaa/Desktop/api/static/date/favorite.csv", mode="w", newline="")
+    writer = csv.writer(e)
+    for data in favorite:
+        writer.writerow(data)
+    e.close()
+
+    return jsonify()
+
+
+@app.route("/editfavo")
+def edit():
+    number=[1,2,3,4,5,6]
+    name=[]
+    date=[]
+    csv_file = open("/home/sumaa/Desktop/api/static/date/favorite.csv", "r", encoding="UTF-8", errors="", newline="" )
+    f = csv.reader(csv_file, delimiter=",", doublequote=True, lineterminator="\r\n", quotechar='"', skipinitialspace=True)
+
+    for row in f:
+        name.append(row[0])
+        date.append(row[1])
+        print(row)
+
+    return render_template("favorite.html",data=zip(number,name,date))
+
 
 
 @app.route("/delete/<filename>", methods=["POST"])
@@ -126,6 +230,26 @@ def convtime(unixtime):
     locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
     date = dt.strftime('%a')
     return  str(date)
+
+@app.route("/disk-info")
+def diskinfo():
+    dsk = psutil.disk_usage('/mnt/ex-ssd/datefile')
+    return str(dsk.percent)
+
+
+def unixJST(time):
+    JST = timezone(timedelta(hours=+9), 'JST')
+    dt = datetime.fromtimestamp(time).replace(tzinfo=timezone.utc).astimezone(tz=JST)
+    locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
+
+    return dt.strftime('%Y/%m/%d %H:%M:%S')
+
+@app.before_request
+def before_request():
+    if not request.is_secure and app.env != 'development':
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
 
 
 if __name__ == '__main__':

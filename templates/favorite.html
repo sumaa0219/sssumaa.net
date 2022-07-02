@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>sumaaのWEBサイト</title>
+    <link rel="shortcut icon" href="/icon.jpeg" type="image/png">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+    <form action="https://sssumaa.net/register" method="post">
+        <input name="id" type="number" id="id" placeholder="位置番号">
+        <input name="name" type="text" id="name" placeholder="表示名">
+        <input name="word" type="text" id="word" placeholder="URL">
+        <button name="send" type="button" id="send">送信</button>
+        </form>
+    <!-- <a href="#" onclick="javascript:window.history.back(-1);return false;">Back</a>
+    {% for count, name, date in data %}
+    <a href="{{date}}"  id="{{count}}">{{name}}</a>
+
+    {% endfor %} -->
+
+    <script>
+        // const send = document.getElementById("send")
+
+        // send.onclick = () => {
+        $("#send").on("click", function () {
+        
+        const named = document.getElementById("name");
+        xhr = new XMLHttpRequest();
+
+        xhr.open('POST', '/register', true);
+        xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+        var request = "id=" + id.value + "&name=" + named.value + "&word=" + word.value;
+        xhr.send(request);
+        xhr.onload = function () {
+            alert("アップロードが完了しました")
+            location.reload()
+        }
+        xhr.onerror = function () {
+            alert("アップロードに失敗しました")
+            }
+        });
+
+
+
+    </script>

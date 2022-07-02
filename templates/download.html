@@ -11,14 +11,21 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
 </head>
 
 <body>
     <h1 style="color: rgb(4, 255, 79);">ファイル保管庫</h1>
     
-    {% for name, key in data %}
-    <a href="/drive/{{name}}" download id="{{name}}">{{ name }}</a>
-    <button id="{{key}}"> delete </button><br><br>
+    {% for name, ext, size, date, key in data %}
+    <img id="N{{key}}" src="/images/extention/{{ext}}.png" width="4%" height="4%">
+    <a href="/drive/{{name}}"  id="{{name}}">{{ name }}</a>
+    <a style="color: rgb(92, 91, 91) ;">&#009;{{size}}</a>
+    <a style="color: rgb(92, 91, 91) ;">{{date}}</a>
+    <button id="{{key}}"> delete </button>
+    
+    <br><br>
+
     <script>
         $("#{{key}}").click(function () {
             const check = confirm('本当に削除しますか？');
@@ -32,8 +39,15 @@
         })
     </script>
     {% endfor %}
+
+    <!-- {% for ext, key in extdate %}
+    <img id="{{key}}" src="/images/extention/{{ext}}.png" width="5%" height="5%">
+
+
+    {% endfor %} -->
     
     <a href="/">戻る</a><br>
+    <a href="#" onclick="javascript:window.history.back(-1);return false;">Back</a>
 </body>
 
 </html>

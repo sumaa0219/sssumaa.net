@@ -20,16 +20,29 @@
 <body>
 
     <h1 style="color: aqua;">トップページ</h1>
-    <a href="https://www.youtube.com" id="youtube">YouTube</a><br>
+    <!-- <a href="https://www.youtube.com" id="youtube">YouTube</a><br>
     <a href="https://www.amazon.co.jp" id="amazon">Amazon</a><br>
     <a href="https://ee.metro-cit.ac.jp/m5/login/index.php" id="eemetro">電気電子moodle</a><br>
     <a href="https://www.metro-cit.ac.jp/" id="metro">産技高専
     </a><br>
-    <a href="http://sssumaa.com" id="sssumaa">sumaaのWEBサイト</a><br>
-    <a href="https://genshin.hoyoverse.com/ja/home" id="genshin">原神公式ページ</a> <br>
+    <a href="http://sssumaa.net" id="sssumaa">sumaaのWEBサイト</a><br>
+    <a href="https://genshin.hoyoverse.com/ja/home" id="genshin">原神公式ページ</a> <br> -->
+    {% for count, name, date in data %}
+    <a href="{{date}}"  id="id{{count}}" target="_blank">{{name}}</a><br>
+
+    {% endfor %}
     <div id="YMD"></div>
     <div id="timer"></div>
-    <div id="wea"></div>        
+    <div id="wea"></div>
+    <div class="page">
+        <label for="label111" >ブックマーク編集</label>
+        <input type="checkbox" id="label111">
+        <div class="show">
+            <p><iframe src="https://sssumaa.net/editfavo" target="_blank rel="noreferrer noopener></iframe></p>
+        </div>
+
+    </div>
+
     
     <!-- <img src="/images/suugle.png" id ="suugle" ><br> -->
     <form onsubmit="x(); return false;">

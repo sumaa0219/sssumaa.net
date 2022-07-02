@@ -14,7 +14,8 @@
 </head>
 
 <body>
-    <style>
+    
+    <!-- <style>
         #progress_bar {
             margin: 10px 0;
             padding: 3px;
@@ -33,11 +34,28 @@
             height: auto;
             width: 0;
         }
-    </style>
+
+        label > input{
+            display: none;
+        }
+
+        label{
+            padding: 100px;
+            color: aqua;
+            background-color: #ff9999;
+            border-color: chartreuse;
+
+        }
+    </style> -->
     <form action="POST">
         <progress value="0" max="100"></progress>
-        <input type="file" name="file" id="file">
+        <label for = "file">
+            <!-- ここにドラック＆ドロップ -->
+            <input type="file" name="file" multiple id="file"> 
+        </label>
+        
         <button type="button" id="post">upload</button>
+        
     </form>
     <script>
         function updateProgress(e) {
@@ -65,8 +83,9 @@
         });
     </script>
     <form action="/">
-        <button type="submit">戻る</button>
+        <button type="submit">topへ</button>
     </form>
+    <a href="#" onclick="javascript:window.history.back(-1);return false;">Back</a>
 
 </body>
 

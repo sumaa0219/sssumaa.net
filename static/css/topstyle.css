@@ -67,24 +67,24 @@ a{
     right: 10px;
     font-size: 30px;
 }
-#youtube{
+#id1{
     top: 70%;
     left: 20%;
 }
-#amazon{
-    font-family: amazon;
+#id2{
+    /* font-family: amazon; */
     top: 70%;
     left: 50%;
 }
-#eemetro{
+#id3{
     top: 70%;
     left: 80%;
 }
-#sssumaa{
+#id4{
     top: 85%;
     left: 20%;
 }
-#metro{
+#id6{
     top: 85%;
     left: 80%;
 }
@@ -102,8 +102,8 @@ a{
 
 }
 
-#genshin{
-    font-family: GenshinFont;
+#id5{
+    /* font-family: GenshinFont; */
     top: 85%;
     left: 50%;
 }
@@ -236,4 +236,41 @@ a{
 h4{
     text-align: center;
 
+}
+
+.page {
+    margin: 2em 0;/*前後の余白*/
+    padding: 0;
+    position: absolute;
+    top:70px;
+    left: 80%;
+    font-size: 20px;
+}
+
+.page label {
+    padding: 15px;
+    font-weight: bold;
+    border: solid 2px black;
+    cursor :pointer;
+}
+
+.page label:hover {
+    background: #efefef;
+}
+
+.page input {
+    display: none;
+}
+
+.page .show {
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: 0.8s;
+}
+.page input:checked ~ .show {
+    padding: 10px 0;
+    height: auto;
+    opacity: 1;
 }
