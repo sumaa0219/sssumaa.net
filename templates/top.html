@@ -9,8 +9,8 @@
     <title>sumaaのWEBサイト</title>
     <link rel="shortcut icon" href="/icon.jpeg" type="image/png">
 
-    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="/css/topstyle.css">
 </head>
@@ -20,13 +20,7 @@
 <body>
 
     <h1 style="color: aqua;">トップページ</h1>
-    <!-- <a href="https://www.youtube.com" id="youtube">YouTube</a><br>
-    <a href="https://www.amazon.co.jp" id="amazon">Amazon</a><br>
-    <a href="https://ee.metro-cit.ac.jp/m5/login/index.php" id="eemetro">電気電子moodle</a><br>
-    <a href="https://www.metro-cit.ac.jp/" id="metro">産技高専
-    </a><br>
-    <a href="http://sssumaa.net" id="sssumaa">sumaaのWEBサイト</a><br>
-    <a href="https://genshin.hoyoverse.com/ja/home" id="genshin">原神公式ページ</a> <br> -->
+
     {% for count, name, date in data %}
     <a href="{{date}}"  id="id{{count}}" target="_blank">{{name}}</a><br>
 
@@ -53,7 +47,8 @@
         function x() {
             const te = document.getElementById("name111").value;
             console.log(te);
-            location.href = "https://www.google.com/search?q=" + te
+            // location.href = "https://www.google.com/search?q=" + te
+            window.open("https://www.google.com/search?q=" + te,'_blank')
         }
 
         function timerx() {
