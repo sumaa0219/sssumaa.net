@@ -49,6 +49,7 @@
             console.log(te);
             // location.href = "https://www.google.com/search?q=" + te
             window.open("https://www.google.com/search?q=" + te,'_blank')
+            location.reload();
         }
 
         function timerx() {
@@ -103,7 +104,7 @@
                 }
 
                 timer.innerHTML =
-                    '<h3 id = "nowweather"><div id ="city">東京都</div><div id="todaydes">' + e.current.weather[0].description +
+                    '<h3 id = "nowweather"><div id ="city">NYK</div><div id="todaydes">' + e.current.weather[0].description +
                     '</div><div id="temp">' + e.current.temp + '[℃]</div><div id="hum">湿度:' + e.current.humidity +
                     "[%]" + '</div><div id="pre">気圧:' + e.current.pressure + "[hPa]" + '</div><div id="speed">風速:' + e
                     .current.wind_speed + "[m/s]" + '</div></h3>' + str

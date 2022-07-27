@@ -1,6 +1,7 @@
 from crypt import methods
 from email.mime.text import MIMEText
 from itertools import count
+from re import template
 from tkinter import E
 from flask.helpers import url_for
 import csv
@@ -14,6 +15,8 @@ import json
 from datetime import datetime, timezone, timedelta
 import locale
 import psutil 
+from multiprocessing import Process
+import time
 # from flask_httpauth import HTTPBasicAuth
 app = Flask(__name__, static_folder='static',static_url_path="")
 # auth = HTTPBasicAuth()
@@ -34,31 +37,6 @@ lat = "42.2128"
 lon = "-71.0342"
 
 
-
-
-
-
-# MAIL_ADDRESS = "skotaosugi0219@gmail.com"
-# PASSWORD = "kota0219"
-
-# id_list = {
-#     "sumaa": "0219",
-#     "kanade": "1214",
-#     "haruka": "1026"
-# }
-
-
-# @auth.get_password
-# def get_pw(id):
-#     if id in id_list:
-#         return id_list.get(id)
-#     return None
-
-
-# @app.route('/admin')
-# @auth.login_required
-# def index():
-#     return "Hello, %s!" % auth.username()
 
 @app.before_request
 def before_request():
@@ -251,10 +229,70 @@ def before_request():
         code = 301
         return redirect(url, code=code)
 
+@app.route("/api")
+def api():
+    return "Hello World"
+
+# def create_another_process():
+
+
+# 	print('SubProcessStart')
+
+# 	# サブプロセスを生成する
+# 	p = Process(target=login_process)
+
+# 	# サブプロセスを開始する
+# 	p.start()
+
+# def login_process():
+#     global flag_login_time
+#     global start_time
+#     start_time =0.0
+#     while(1):
+#         now_time=time.time()
+#         # if start_time >= 1800.00:
+#         if now_time-start_time >= 10.00:
+#             flag_login_time = 0
+
+#         else:
+#             time.sleep(1)
+
+
+# def login():
+
+#     if flag_login_time == 0:
+
+#         return render_template("login.html")
+
+#     else:
+#         start_time = time.time()
+
+
+# # flag_login_timeのリセットをログイン認証のPOSTにつけるとグローバル宣言
+
+# @app.route("/signin", methods=["POST"])
+# def signin():
+#     username: str = request.form["id"]
+#     password: str = request.form["Passwords"]
+
+#     if username == "sumaa":
+#         if password == "kota0219":
+#             flag_login_time = time.time()
+#             return "aaaaaa"
+        
+#         else:
+#             return redirect("https://sssumaa.net/login", code=301)
+
+#     else:
+#             return redirect("https://sssumaa.net/login", code=301)
+
+# @app.route("/login")
+# def loginpage():
+#     return render_template("login.html")
 
 if __name__ == '__main__':
 
-    
+
 
 
     app.run(host="0.0.0.0",ssl_context=('/etc/letsencrypt/live/sssumaa.net/fullchain.pem', '/etc/letsencrypt/live/sssumaa.net/privkey.pem'),debug=True,threaded=True)
