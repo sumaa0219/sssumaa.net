@@ -8,7 +8,7 @@ import csv
 import os
 import os.path
 from flask import Flask,render_template,request,redirect,Blueprint,jsonify
-from numpy import count_nonzero, number
+import numpy as np
 from werkzeug.utils import secure_filename
 import requests
 import json
@@ -16,7 +16,8 @@ from datetime import datetime, timezone, timedelta
 import locale
 import psutil 
 from multiprocessing import Process
-import time
+import pandas as pd
+import sub
 # from flask_httpauth import HTTPBasicAuth
 app = Flask(__name__, static_folder='static',static_url_path="")
 # auth = HTTPBasicAuth()
@@ -229,9 +230,34 @@ def before_request():
         code = 301
         return redirect(url, code=code)
 
-@app.route("/api")
-def api():
-    return "Hello World"
+@app.route("/api/<string:type>")
+def api(type):
+    api_Element = request.args.get("element", type=str)
+    api_Type = request.args.get("type", type=str)
+    api_Value = request.args.get("value",type=int)
+    api = sub.api()
+    
+    if type == "status":
+        if api_Type == "R" or api_Type == "r":
+            return api.GetStatus(api_Element)
+
+        elif api_Type == "W" or api_Type == "w":
+            return api.PostStatus(api_Element,api_Value)
+
+    elif type == "setting":
+        if api_Type == "R" or api_Type == "r":
+            return api.GetSetting(api_Element)
+
+        elif api_Type == "W" or api_Type == "w":
+            return api.PostSetting(api_Element,api_Value)
+
+@app.route("/try")
+def ty():
+
+    api = sub.api()
+    return api.GetStatus(element="tempreture")
+
+
 
 # def create_another_process():
 
