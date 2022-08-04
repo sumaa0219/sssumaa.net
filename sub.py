@@ -1,11 +1,38 @@
-from flask import Flask ,request,redirect,url_for,render_template
+from pickletools import int4
+import numpy as np
+import pandas as pd
 
-app = Flask( __name__ ) 
 
-@app.route('/') 
-def hello_world():
+class api:
+    def __init__(self):
+        global df
+        df = pd.read_csv("/home/sumaa/Desktop/api/static/date/ApiDateBase.csv",index_col=0)
+        pass
 
-    return render_template('test.html')
+    def GetStatus(self, element):
+        self.element = element
+        id = "status"
+        value = df[id][self.element]
+        return value
 
-if __name__ == '__main__': 
-    app.run(host='0.0.0.0', port=13700, debug=True)
+    def PostStatus(self, element, value:int):
+        self.element = element
+        self.value:int = value
+        id = "status"
+        df.at[self.element,id] = self.value
+        df.to_csv("/home/sumaa/Desktop/api/static/date/ApiDateBase.csv")
+        return "Post_Status"
+    
+    def GetSetting(self, element):
+        self.element = element
+        id = "setting"
+        value = df[id][self.element]
+        return value
+
+    def PostSetting(self, element, value:int):
+        self.element = element
+        self.value:int = value
+        id = "setting"
+        df.at[self.element,id] = self.value
+        df.to_csv("/home/sumaa/Desktop/api/static/date/ApiDateBase.csv")
+        return "Post_setting"
