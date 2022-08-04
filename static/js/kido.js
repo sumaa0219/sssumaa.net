@@ -1,3 +1,0 @@
-function aaaa() {
-    alert("sumaaのバーカ")
- }

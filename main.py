@@ -4,6 +4,7 @@ from itertools import count
 from re import template
 from tkinter import E
 from flask.helpers import url_for
+from flask_httpauth import HTTPBasicAuth
 import csv
 import os
 import os.path
@@ -17,10 +18,10 @@ import locale
 import psutil 
 from multiprocessing import Process
 import pandas as pd
-import sub
-# from flask_httpauth import HTTPBasicAuth
+import api
+
 app = Flask(__name__, static_folder='static',static_url_path="")
-# auth = HTTPBasicAuth()
+auth = HTTPBasicAuth()
 
 add_app = Blueprint("datefile", __name__, static_url_path="/drive", static_folder="/mnt/ex-ssd/datefile")#ここのパスも変える
 # add_app = Blueprint("datefile", __name__, static_url_path="/drive", static_folder="/home/sumaa/Desktop/api")
@@ -37,15 +38,16 @@ wetherapikey = "80efcb09546b956c8fa14024be0cd5fa"
 lat = "42.2128"
 lon = "-71.0342"
 
+users = {
+    "sumaa": "kota0219",
+    "admin": "skotakota0219"
+}
 
-
-@app.before_request
-def before_request():
-    if not request.is_secure and app.env != 'development':
-        url = request.url.replace('http://', 'https://', 1)
-        code = 301
-        return redirect(url, code=code)
-
+@auth.get_password
+def get_pw(username):
+    if username in users:
+        return users.get(username)
+    return None
 
 @app.route('/.well-known/acme-challenge/<filename>')
 def well_known(filename):
@@ -53,13 +55,9 @@ def well_known(filename):
 
 
 @app.route("/")
-def hell():
+def test():
     return render_template("test.html")
 
-
-@app.route("/GfN")
-def GfNindex():
-    return render_template("web/GfN.html")
 
 @app.route("/top")
 def top():
@@ -75,11 +73,6 @@ def top():
         print(row)
 
     return render_template("top.html",data=zip(number,name,date))
-
-@app.route("/GfN/<string:st>")
-def GfN(st):
-    s = "web/" + st + ".html"
-    return render_template(s)
 
 @app.route("/download")
 def download():
@@ -142,9 +135,6 @@ def register():
     ID= int(regiID)-1
     print(reginame)
     print(regiword)
-    # with open("static/date/favorite.csv") as f:
-    #     list = f.readlines
-    # list[regiID-1] = regiword
     csv_file = open("/home/sumaa/Desktop/api/static/date/favorite.csv", "r", encoding="UTF-8", errors="", newline="" )
     f = csv.reader(csv_file, delimiter=",", doublequote=True, lineterminator="\r\n", quotechar='"', skipinitialspace=True)
 
@@ -170,6 +160,7 @@ def register():
 
 
 @app.route("/editfavo")
+@auth.login_required
 def edit():
     number=[1,2,3,4,5,6]
     name=[]
@@ -223,19 +214,13 @@ def unixJST(time):
 
     return dt.strftime('%Y/%m/%d %H:%M:%S')
 
-@app.before_request
-def before_request():
-    if not request.is_secure and app.env != 'development':
-        url = request.url.replace('http://', 'https://', 1)
-        code = 301
-        return redirect(url, code=code)
 
 @app.route("/api/<string:type>")
 def api(type):
     api_Element = request.args.get("element", type=str)
     api_Type = request.args.get("type", type=str)
     api_Value = request.args.get("value",type=int)
-    api = sub.api()
+    api = api.api()
     
     if type == "status":
         if api_Type == "R" or api_Type == "r":
@@ -254,71 +239,12 @@ def api(type):
 @app.route("/try")
 def ty():
 
-    api = sub.api()
+    api = api.api()
     return api.GetStatus(element="tempreture")
 
 
 
-# def create_another_process():
-
-
-# 	print('SubProcessStart')
-
-# 	# サブプロセスを生成する
-# 	p = Process(target=login_process)
-
-# 	# サブプロセスを開始する
-# 	p.start()
-
-# def login_process():
-#     global flag_login_time
-#     global start_time
-#     start_time =0.0
-#     while(1):
-#         now_time=time.time()
-#         # if start_time >= 1800.00:
-#         if now_time-start_time >= 10.00:
-#             flag_login_time = 0
-
-#         else:
-#             time.sleep(1)
-
-
-# def login():
-
-#     if flag_login_time == 0:
-
-#         return render_template("login.html")
-
-#     else:
-#         start_time = time.time()
-
-
-# # flag_login_timeのリセットをログイン認証のPOSTにつけるとグローバル宣言
-
-# @app.route("/signin", methods=["POST"])
-# def signin():
-#     username: str = request.form["id"]
-#     password: str = request.form["Passwords"]
-
-#     if username == "sumaa":
-#         if password == "kota0219":
-#             flag_login_time = time.time()
-#             return "aaaaaa"
-        
-#         else:
-#             return redirect("https://sssumaa.net/login", code=301)
-
-#     else:
-#             return redirect("https://sssumaa.net/login", code=301)
-
-# @app.route("/login")
-# def loginpage():
-#     return render_template("login.html")
-
 if __name__ == '__main__':
-
-
 
 
     app.run(host="0.0.0.0",ssl_context=('/etc/letsencrypt/live/sssumaa.net/fullchain.pem', '/etc/letsencrypt/live/sssumaa.net/privkey.pem'),debug=True,threaded=True)
