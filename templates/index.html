@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>sumaaのWEBサイト</title>
+    <link rel="shortcut icon" href="/icon.jpeg" type="image/png">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="/css/topstyle.css">
+
+</head>
+
+<html>
+
+<body>
+
+    <h1 style="color: aqua;">トップページ</h1>
+
+    {% for count, name, date in data %}
+    <a href="{{date}}"  id="id{{count}}" target="_blank">{{name}}</a><br>
+
+    {% endfor %}
+    <div id="YMD"></div>
+    <div id="timer"></div>
+    <div id="wea"></div>
+    <div class="page">
+        <label for="label111" >ブックマーク編集</label>
+        <input type="checkbox" id="label111">
+        <div class="show">
+            <p><iframe src="https://sssumaa.net/editfavo" target="_blank rel="noreferrer noopener></iframe></p>
+        </div>
+
+    </div>
+
+    
+    <!-- <img src="/images/suugle.png" id ="suugle" ><br> -->
+    <form onsubmit="x(); return false;">
+        <input type="search" id="name111" name="name" requiredminlength="200" maxlength="2048" size="100" />
+    </form>
+
+    <script type="text/javascript">
+        function x() {
+            const te = document.getElementById("name111").value;
+            console.log(te);
+            // location.href = "https://www.google.com/search?q=" + te
+            window.open("https://www.google.com/search?q=" + te,'_blank')
+            location.reload();
+        }
+
+        function timerx() {
+            var now = new window.Date();
+            const timer = document.getElementById("timer");
+            var Hour = now.getHours();
+            var Min = now.getMinutes();
+            var Sec = now.getSeconds();
+            if (Min < 10) {
+                Min = "0"+Min;
+            }
+            if (Sec < 10) {
+                Sec = "0"+Sec;
+            }
+
+            timer.innerHTML = Hour + ":" + Min + ":" + Sec;
+        }
+
+        function timery() {
+            var now = new window.Date();
+            const timer = document.getElementById("YMD");
+            var Year = now.getFullYear();
+            var Month = now.getMonth() + 1;
+            var Date = now.getDate();
+
+            timer.innerHTML = Year + "年" + Month + "月" + Date + "日";
+        }
+
+
+        setInterval(timerx, 100)
+        setInterval(timery, 1000)
+
+        window.onload = () => {
+            getwhather()
+            document.getElementById("name111").focus();
+        }
+
+        function getwhather() {
+            navigator.geolocation.getCurrentPosition((position)=>{  
+
+                let lat=position.coords.latitude;
+                let lon=position.coords.longitude;
+
+                fetch("/api/wheather?lat=" + lat + "&lon=" + lon).then((e) => e.json()).then(async(e) => {
+                const timer = document.getElementById("wea");
+                console.log(e)
+                let str = '';
+                for (let i = 0; i < 7; i++) {
+                    const unixtime = e.daily[i].dt;
+                    str += ''
+                    await fetch("/api/unixJST?unixtime=" + unixtime).then((response) => response.text()).then((text) => {
+                        str +=
+                            `<h4 id="wha${i}"><div class="date">${text}</div><div class="description">${ e.daily[i].weather[0].description}</div><div class="temp_max">最高気温:${ e.daily[i].temp.max}[℃]</div><div class="temp_min">最低気温:${ e.daily[i].temp.min}[℃]</div></h4>`
+
+                    })
+
+                }
+
+                timer.innerHTML =
+                    '<h3 id = "nowweather"><div id ="city">'+ e.timezone+'</div><div id="todaydes">' + e.current.weather[0].description +
+                    '</div><div id="temp">' + e.current.temp + '[℃]</div><div id="hum">湿度:' + e.current.humidity +
+                    "[%]" + '</div><div id="pre">気圧:' + e.current.pressure + "[hPa]" + '</div><div id="speed">風速:' + e
+                    .current.wind_speed + "[m/s]" + '</div></h3>' + str
+
+                })
+
+            });
+
+            
+        }
+    </script>
+
+
+</body>
+
+</html>

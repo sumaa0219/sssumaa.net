@@ -1,6 +1,5 @@
+from code import interact
 from crypt import methods
-from email.mime.text import MIMEText
-from itertools import count
 from re import template
 from tkinter import E
 from flask.helpers import url_for
@@ -11,17 +10,26 @@ import os.path
 from flask import Flask,render_template,request,redirect,Blueprint,jsonify
 import numpy as np
 from werkzeug.utils import secure_filename
-import requests
-import json
-from datetime import datetime, timezone, timedelta
-import locale
 import psutil 
-from multiprocessing import Process
-import pandas as pd
 import api
+from flask_login import UserMixin,LoginManager,login_user, logout_user, login_required, current_user
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash,check_password_hash
 
 app = Flask(__name__, static_folder='static',static_url_path="")
 auth = HTTPBasicAuth()
+
+global URL
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+app.config['SECRET_KEY'] = os.urandom(24)
+class User(UserMixin, db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	username = db.Column(db.String(50), nullable=False, unique=True)
+	password = db.Column(db.String(25))
 
 add_app = Blueprint("datefile", __name__, static_url_path="/drive", static_folder="/mnt/ex-ssd/datefile")#ここのパスも変える
 # add_app = Blueprint("datefile", __name__, static_url_path="/drive", static_folder="/home/sumaa/Desktop/api")
@@ -32,34 +40,62 @@ UPLOAD_FOLDER = '/mnt/ex-ssd/datefile/' #ここに絶対パス
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JSON_AS_ASCII'] = False
 
+apixx = api.apiX()
 
-wetherapikey = "80efcb09546b956c8fa14024be0cd5fa"
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == "POST":
+        username = request.form.get('username')
+        password = request.form.get('password')
+        # Userのインスタンスを作成
+        user = User(username=username, password=generate_password_hash(password, method='sha256'))
+        db.session.add(user)
+        db.session.commit()
+        return redirect('/login')
+    else:
+        return render_template('signup.html')
 
-lat = "42.2128"
-lon = "-71.0342"
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == "POST":
+        username = request.form.get('username')
+        password = request.form.get('password')
+        # Userテーブルからusernameに一致するユーザを取得
+        user = User.query.filter_by(username=username).first()
+        if check_password_hash(user.password, password):
+            login_user(user)
+            return redirect('/top')
+    else:
+        return render_template('login.html')
 
-users = {
-    "sumaa": "kota0219",
-    "admin": "skotakota0219"
-}
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect('/login')
 
-@auth.get_password
-def get_pw(username):
-    if username in users:
-        return users.get(username)
-    return None
+@app.errorhandler(401)
+def page_not_found(e):
+    print(e)
+    return redirect('/login')
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 @app.route('/.well-known/acme-challenge/<filename>')
 def well_known(filename):
     return render_template('.well-known/acme-challenge/'+ filename)
 
 
-@app.route("/")
-def test():
-    return render_template("test.html")
-
-
 @app.route("/top")
+@login_required
+def test():
+    print(current_user.id)
+    return render_template("top.html")
+
+
+@app.route("/")
 def top():
     number=[1,2,3,4,5,6]
     name=[]
@@ -72,7 +108,7 @@ def top():
         date.append(row[1])
         print(row)
 
-    return render_template("top.html",data=zip(number,name,date))
+    return render_template("index.html",data=zip(number,name,date))
 
 @app.route("/download")
 def download():
@@ -107,7 +143,7 @@ def download():
         else:
             sizeB =str(size)+"B"
 
-        list_date.append(unixJST(time))
+        list_date.append(apixx.unixJST(time))
         list_size.append(sizeB)
 
     filekey = list(range(len(filename)))
@@ -115,6 +151,7 @@ def download():
 
 
 @app.route("/upload")
+@login_required
 def upload():
     return render_template("upload.html")
 
@@ -160,7 +197,6 @@ def register():
 
 
 @app.route("/editfavo")
-@auth.login_required
 def edit():
     number=[1,2,3,4,5,6]
     name=[]
@@ -171,7 +207,6 @@ def edit():
     for row in f:
         name.append(row[0])
         date.append(row[1])
-        print(row)
 
     return render_template("favorite.html",data=zip(number,name,date))
 
@@ -183,58 +218,40 @@ def delete(filename):
     print(filename)
     return jsonify()
 
-@app.route("/youtube")
-def youtube():
-    return render_template("youtube.html")
-
-@app.route("/wheather")
-def wheather():
-    params = {'zipcode':'2330008'}
-    reswea = requests.get("https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon="+lon +"&exclude=dairy&appid="+wetherapikey+"&lang=ja&units=metric", params=params)
-    return json.dumps(reswea.json())
-    
-@app.route("/unixJST/<int:unixtime>")
-def convtime(unixtime):
-    JST = timezone(timedelta(hours=+9), 'JST')
-    dt = datetime.fromtimestamp(unixtime).replace(tzinfo=timezone.utc).astimezone(tz=JST)
-    locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
-    date = dt.strftime('%a')
-    return  str(date)
-
 @app.route("/disk-info")
 def diskinfo():
     dsk = psutil.disk_usage('/mnt/ex-ssd/datefile')
     return str(dsk.percent)
-
-
-def unixJST(time):
-    JST = timezone(timedelta(hours=+9), 'JST')
-    dt = datetime.fromtimestamp(time).replace(tzinfo=timezone.utc).astimezone(tz=JST)
-    locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
-
-    return dt.strftime('%Y/%m/%d %H:%M:%S')
-
 
 @app.route("/api/<string:type>")
 def api(type):
     api_Element = request.args.get("element", type=str)
     api_Type = request.args.get("type", type=str)
     api_Value = request.args.get("value",type=int)
-    api = api.api()
+    api_lat = request.args.get("lat",type=str)
+    api_lon = request.args.get("lon",type=str)
+    api_unixtime = request.args.get("unixtime",type=int)
     
     if type == "status":
         if api_Type == "R" or api_Type == "r":
-            return api.GetStatus(api_Element)
+            return apixx.GetStatus(api_Element)
 
         elif api_Type == "W" or api_Type == "w":
-            return api.PostStatus(api_Element,api_Value)
+            return apixx.PostStatus(api_Element,api_Value)
 
     elif type == "setting":
         if api_Type == "R" or api_Type == "r":
-            return api.GetSetting(api_Element)
+            return apixx.GetSetting(api_Element)
 
         elif api_Type == "W" or api_Type == "w":
-            return api.PostSetting(api_Element,api_Value)
+            return apixx.PostSetting(api_Element,api_Value)
+    
+    elif type == "wheather":
+        return apixx.wheather(api_lat,api_lon)
+    
+    elif type == "unixJST":
+        return apixx.convtime(api_unixtime)
+
 
 @app.route("/try")
 def ty():
