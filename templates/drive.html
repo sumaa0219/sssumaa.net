@@ -17,9 +17,9 @@
 <body>
     <h1 style="color: rgb(4, 255, 79);">ファイル保管庫</h1>
     
-    {% for name, ext, size, date, key in data %}
+    {% for path, name, ext, size, date, key in data %}
     <img id="N{{key}}" src="/images/extention/{{ext}}.png" width="4%" height="4%">
-    <a href="/drive/{{name}}"  id="{{name}}">{{ name }}</a>
+    <a href="{{path}}"  id="{{name}}">{{ name }}</a>
     <a style="color: rgb(92, 91, 91) ;">&#009;{{size}}</a>
     <a style="color: rgb(92, 91, 91) ;">{{date}}</a>
     <button id="{{key}}"> delete </button>

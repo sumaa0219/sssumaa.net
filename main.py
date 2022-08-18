@@ -15,6 +15,7 @@ import api
 from flask_login import UserMixin,LoginManager,login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash,check_password_hash
+import drive
 
 app = Flask(__name__, static_folder='static',static_url_path="")
 auth = HTTPBasicAuth()
@@ -36,11 +37,12 @@ add_app = Blueprint("datefile", __name__, static_url_path="/drive", static_folde
 app.register_blueprint(add_app)
 
 
-UPLOAD_FOLDER = '/mnt/ex-ssd/datefile/' #ここに絶対パス
+UPLOAD_FOLDER = '/mnt/ex-ssd/datefile/admin/' #ここに絶対パス
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JSON_AS_ASCII'] = False
 
 apixx = api.apiX()
+drivexx = drive.driveX()
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -110,44 +112,33 @@ def top():
 
     return render_template("index.html",data=zip(number,name,date))
 
+
+
 @app.route("/download")
 def download():
-    list_ext=[]
-    list_size=[]
-    list_date=[]
-    filename = os.listdir(path=app.config['UPLOAD_FOLDER'])
-    filename.sort()
-    count=len(filename)
-    for x in range(count):
-        ext = filename[x].find('.')
-        size = os.path.getsize(UPLOAD_FOLDER + filename[x])
-        time = os.path.getctime(UPLOAD_FOLDER + filename[x])
-        list_ext.append(filename[x][ext+1:].lower())
+    user_path = request.args.get("path", type=str)
+    ListURL = []
+    ListSize = []
+    ListTime = []
+    ListExt = []
+    ListKey = []
+    if user_path != None:
+        StrageList = drivexx.sort("user/" + user_path+"/")
+    else:
+        StrageList = drivexx.sort("user/")
 
-        if size >= 1000000000000:
-            size = size/1000000000000
-            sizeB =str(size)+"TB"
+    ListURL = drivexx.GenerateURL(StrageList,"/download","user")
 
-        elif size >= 1000000000:
-            size = size/1000000000
-            sizeB =str(size)+"GB"
+    for x in range(len(StrageList)):
+        size,time,ext=drivexx.info(StrageList,x)
+        ListSize.append(size)
+        ListTime.append(time)
+        ListExt.append(ext)
+        ListKey.append(x)
 
-        elif size >= 1000000:
-            size = size/1000000
-            sizeB =str(size)+"MB"
+    return render_template("drive.html", data=zip(ListURL, StrageList, ListExt,ListSize,ListTime, ListKey))
 
-        elif size >= 1000:
-            size = size/1000
-            sizeB =str(size)+"KB"
 
-        else:
-            sizeB =str(size)+"B"
-
-        list_date.append(apixx.unixJST(time))
-        list_size.append(sizeB)
-
-    filekey = list(range(len(filename)))
-    return render_template("download.html", data=zip(filename, list_ext,list_size,list_date, filekey))
 
 
 @app.route("/upload")
@@ -158,9 +149,11 @@ def upload():
 
 @app.route("/put", methods=["POST"])
 def put():
-    putFile = request.files["file"]
-    putName = secure_filename(putFile.filename)
-    putFile.save(os.path.join(app.config['UPLOAD_FOLDER'], putName))
+    putFile = request.files.getlist["file"]
+    for File in putFile:
+        print(File)
+        putName = secure_filename(File.filename)
+        File.save(os.path.join(app.config['UPLOAD_FOLDER'], putName))
     return jsonify()
 
 @app.route("/register", methods=["POST"])
@@ -224,7 +217,7 @@ def diskinfo():
     return str(dsk.percent)
 
 @app.route("/api/<string:type>")
-def api(type):
+def apii(type):
     api_Element = request.args.get("element", type=str)
     api_Type = request.args.get("type", type=str)
     api_Value = request.args.get("value",type=int)
@@ -251,6 +244,34 @@ def api(type):
     
     elif type == "unixJST":
         return apixx.convtime(api_unixtime)
+
+
+@app.route("/admin/<string:service>")
+def AdminService(service):
+    admin_path = request.args.get("path", type=str)
+    if service == "strage":
+        ListURL = []
+        ListSize = []
+        ListTime = []
+        ListExt = []
+        ListKey = []
+        if admin_path != None:
+            StrageList = drivexx.sort("admin/" + admin_path+"/")
+        else:
+            StrageList = drivexx.sort("admin/")
+
+        ListURL = drivexx.GenerateURL(StrageList,"/admin/strage","admin")
+
+        for x in range(len(StrageList)):
+            size,time,ext=drivexx.info(StrageList,x)
+            ListSize.append(size)
+            ListTime.append(time)
+            ListExt.append(ext)
+            ListKey.append(x)
+
+        return render_template("drive.html", data=zip(ListURL, StrageList, ListExt,ListSize,ListTime, ListKey))
+
+
 
 
 @app.route("/try")
