@@ -6,6 +6,7 @@ from turtle import Turtle
 import api
 
 BasePath ="/mnt/ex-ssd/datefile/"
+BaseURL = "https://sssumaa.net"
 apixx=api.apiX()
 
 class driveX:
@@ -65,10 +66,9 @@ class driveX:
         else:
             return str(self.size)+"B"
 
-    def GenerateURL(self, List:list,RootPath,Permission):
+    def GenerateURL(self, List:list,RootPath):
         self.List = List
         self.RootPath = RootPath
-        self.Permission = Permission
         URLList = []
         for i in range(len(self.List)):
             SerchPath = DrivePath + self.List[i]
@@ -77,15 +77,28 @@ class driveX:
 
             if os.path.isdir(SerchPath) == True:
                 URL = self.RootPath + "?path=" + FilePath
-                print(SerchPath + " " + self.RootPath + " " + FilePath)
-                print(URL)
+                #print(SerchPath + " " + self.RootPath + " " + FilePath)
 
             else:
                 URL = "/drive/" + FilePath
-                print(URL)
             
             URLList.append(URL)
 
         return URLList
 
+    def PathList(self,path,url):
+        self.path = path
+        self.url = url
+        pathlist = self.path.split("/")
+        PathURLList = []
+        PathName = []
+
+        for i in range(len(pathlist)):
+            if i == 0:
+                pathxx = pathlist[i]
+            else:
+                pathxx = pathxx + "/" + pathlist[i]
+            PathName.append(pathlist[i])
+            PathURLList.append(BaseURL + self.url +"?path="+ pathxx)
+        return range(len(pathlist)),PathName,PathURLList
 drive=driveX()

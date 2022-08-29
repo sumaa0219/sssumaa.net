@@ -47,11 +47,11 @@
 
         }
     </style> -->
-    <form action="POST">
+    <form action="POST" enctype = "multipart/form-data">
         <progress value="0" max="100"></progress>
         <label for = "file">
             <!-- ここにドラック＆ドロップ -->
-            <input type="file" name="file" webkitdirectory directory multiple id="file"> 
+            <input type="file" name="file" multiple="multiple" id="file"> 
         </label>
         
         <button type="button" id="post">upload</button>
@@ -66,20 +66,23 @@
 
         }
         $("#post").on("click", function () {
-            const formData = new FormData();
-            formData.append("file", document.getElementById("file").files[0]);
-            const request = new XMLHttpRequest();
-            request.upload.addEventListener("progress", updateProgress, false);
-            request.open("POST", "/put");
-            request.overrideMimeType('file; charset=UTF-8');
-            request.send(formData);
+            let len = document.getElementById('file').files.length;
+            for(let i = 0 ; i < len ; i++){
+                var formData = new FormData();
+                formData.append("file", document.getElementById("file").files[i]);
+                var request = new XMLHttpRequest();
+                request.upload.addEventListener("progress", updateProgress, false);
+                request.open("POST", "/put");
+                request.overrideMimeType('file; charset=UTF-8');
+                request.send(formData);
+                request.onerror = function () {
+                    alert("アップロードに失敗しました")
+                }
+            }
             request.onload = function () {
-                alert("アップロードが完了しました")
-                location.reload()
-            }
-            request.onerror = function () {
-                alert("アップロードに失敗しました")
-            }
+                    alert("アップロードが完了しました")
+                    location.reload()
+                }
         });
     </script>
     <form action="/">

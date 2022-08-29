@@ -31,6 +31,7 @@ class apiX:
         return dt.strftime('%Y/%m/%d %H:%M:%S')
 
     def GetStatus(self, element):
+        value = 0
         self.element = element
         id = "status"
         value = df[id][self.element]
@@ -42,9 +43,10 @@ class apiX:
         id = "status"
         df.at[self.element,id] = self.value
         df.to_csv("/home/sumaa/Desktop/api/static/date/ApiDateBase.csv")
-        return "Post_Status"
+        return "Post_Succese"
     
     def GetSetting(self, element):
+        value = 0
         self.element = element
         id = "setting"
         value = df[id][self.element]

@@ -37,7 +37,7 @@ add_app = Blueprint("datefile", __name__, static_url_path="/drive", static_folde
 app.register_blueprint(add_app)
 
 
-UPLOAD_FOLDER = '/mnt/ex-ssd/datefile/admin/' #ここに絶対パス
+UPLOAD_FOLDER = '/mnt/ex-ssd/datefile/' #ここに絶対パス
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JSON_AS_ASCII'] = False
 
@@ -66,7 +66,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if check_password_hash(user.password, password):
             login_user(user)
-            return redirect('/top')
+            return redirect('/admin/strage')
     else:
         return render_template('login.html')
 
@@ -91,9 +91,8 @@ def well_known(filename):
 
 
 @app.route("/top")
-@login_required
 def test():
-    print(current_user.id)
+    # print(current_user.id)
     return render_template("top.html")
 
 
@@ -108,7 +107,6 @@ def top():
     for row in f:
         name.append(row[0])
         date.append(row[1])
-        print(row)
 
     return render_template("index.html",data=zip(number,name,date))
 
@@ -122,12 +120,21 @@ def download():
     ListTime = []
     ListExt = []
     ListKey = []
+    PathNum = []
+    PathName = []
+    PathURL = []
     if user_path != None:
-        StrageList = drivexx.sort("user/" + user_path+"/")
+        if "admin" in user_path:
+            return "Permission Error"
+        else:
+            StrageList = drivexx.sort(user_path+"/")
+            PathNum,PathName,PathURL = drivexx.PathList(user_path,"/download")
+            PutPath = user_path
     else:
         StrageList = drivexx.sort("user/")
+        PutPath = "user/"
 
-    ListURL = drivexx.GenerateURL(StrageList,"/download","user")
+    ListURL = drivexx.GenerateURL(StrageList,"/download")
 
     for x in range(len(StrageList)):
         size,time,ext=drivexx.info(StrageList,x)
@@ -136,7 +143,7 @@ def download():
         ListExt.append(ext)
         ListKey.append(x)
 
-    return render_template("drive.html", data=zip(ListURL, StrageList, ListExt,ListSize,ListTime, ListKey))
+    return render_template("drive.html", data=zip(ListURL, StrageList, ListExt,ListSize,ListTime, ListKey),path=zip(PathNum,PathName,PathURL),putpath = PutPath)
 
 
 
@@ -149,11 +156,12 @@ def upload():
 
 @app.route("/put", methods=["POST"])
 def put():
-    putFile = request.files.getlist["file"]
-    for File in putFile:
-        print(File)
-        putName = secure_filename(File.filename)
-        File.save(os.path.join(app.config['UPLOAD_FOLDER'], putName))
+    put_path = request.args.get("path", type=str)
+    putFile = request.files["file"]
+    print(putFile)
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER + put_path
+    putName = secure_filename(putFile.filename)
+    putFile.save(os.path.join(app.config['UPLOAD_FOLDER'], putName))
     return jsonify()
 
 @app.route("/register", methods=["POST"])
@@ -188,7 +196,6 @@ def register():
 
     return jsonify()
 
-
 @app.route("/editfavo")
 def edit():
     number=[1,2,3,4,5,6]
@@ -203,12 +210,12 @@ def edit():
 
     return render_template("favorite.html",data=zip(number,name,date))
 
-
-
-@app.route("/delete/<filename>", methods=["POST"])
+@app.route("/delete/<filename>")
 def delete(filename):
+    delete_path = request.args.get("path", type=str)
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER + delete_path
     os.remove(app.config['UPLOAD_FOLDER'] + str(filename))
-    print(filename)
+    print(app.config['UPLOAD_FOLDER'] + filename)
     return jsonify()
 
 @app.route("/disk-info")
@@ -227,14 +234,14 @@ def apii(type):
     
     if type == "status":
         if api_Type == "R" or api_Type == "r":
-            return apixx.GetStatus(api_Element)
+            return str(apixx.GetStatus(api_Element))
 
         elif api_Type == "W" or api_Type == "w":
             return apixx.PostStatus(api_Element,api_Value)
 
     elif type == "setting":
         if api_Type == "R" or api_Type == "r":
-            return apixx.GetSetting(api_Element)
+            return str(apixx.GetSetting(api_Element))
 
         elif api_Type == "W" or api_Type == "w":
             return apixx.PostSetting(api_Element,api_Value)
@@ -247,6 +254,7 @@ def apii(type):
 
 
 @app.route("/admin/<string:service>")
+@login_required
 def AdminService(service):
     admin_path = request.args.get("path", type=str)
     if service == "strage":
@@ -255,12 +263,18 @@ def AdminService(service):
         ListTime = []
         ListExt = []
         ListKey = []
+        PathNum = []
+        PathName = []
+        PathURL = []
         if admin_path != None:
-            StrageList = drivexx.sort("admin/" + admin_path+"/")
+            StrageList = drivexx.sort(admin_path+"/")
+            PathNum,PathName,PathURL = drivexx.PathList(admin_path,"/admin/strage")
+            PutPath = admin_path+"/"
         else:
             StrageList = drivexx.sort("admin/")
+            PutPath = "admin/"
 
-        ListURL = drivexx.GenerateURL(StrageList,"/admin/strage","admin")
+        ListURL = drivexx.GenerateURL(StrageList,"/admin/strage")
 
         for x in range(len(StrageList)):
             size,time,ext=drivexx.info(StrageList,x)
@@ -269,7 +283,7 @@ def AdminService(service):
             ListExt.append(ext)
             ListKey.append(x)
 
-        return render_template("drive.html", data=zip(ListURL, StrageList, ListExt,ListSize,ListTime, ListKey))
+        return render_template("drive.html", data=zip(ListURL, StrageList, ListExt,ListSize,ListTime, ListKey),path=zip(PathNum,PathName,PathURL),putpath = PutPath)
 
 
 
@@ -280,12 +294,18 @@ def ty():
     api = api.api()
     return api.GetStatus(element="tempreture")
 
-
+@app.before_request
+def before_request():
+    if not request.is_secure and app.env != 'development':
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
 
 if __name__ == '__main__':
 
 
     app.run(host="0.0.0.0",ssl_context=('/etc/letsencrypt/live/sssumaa.net/fullchain.pem', '/etc/letsencrypt/live/sssumaa.net/privkey.pem'),debug=True,threaded=True)
+    #app.run(host="0.0.0.0",debug=True,threaded=True)
 
 
 # sumaa@raspberrypi:~/Desktop/api $ sudo certbot certonly --webroot -w /home/sumaa/Desktop/api/templates/ -d sssumaa.net

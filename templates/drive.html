@@ -16,7 +16,11 @@
 
 <body>
     <h1 style="color: rgb(4, 255, 79);">ファイル保管庫</h1>
-    
+
+    {% for num, name, path in path %}
+    <a href="{{path}}" id="S{{num}}">{{name}}</a>
+    {% endfor %}
+    <br><br><br>
     {% for path, name, ext, size, date, key in data %}
     <img id="N{{key}}" src="/images/extention/{{ext}}.png" width="4%" height="4%">
     <a href="{{path}}"  id="{{name}}">{{ name }}</a>
@@ -27,24 +31,65 @@
     <br><br>
 
     <script>
-        $("#{{key}}").click(function () {
+        $("#{{key}}").click(function() {
+            console.log("click");
             const check = confirm('本当に削除しますか？');
             if (check) {
-                fetch("/delete/{{name}}", { method: "POST" }).then(() => {
+                fetch("/delete/{{name}}?path={{putpath}}", { method: "GET" }).then(() => {
                     location.reload()
                 }).catch((error) => {
                     alert(error)
                 })
             }
+            
         })
     </script>
     {% endfor %}
+    <form action="POST" enctype = "multipart/form-data">
+        <progress value="0" max="100"></progress>
+        <label for = "file">
+            <!-- ここにドラック＆ドロップ -->
+            <input type="file" name="file" multiple="multiple" id="file"> 
+        </label>
+        
+        <button type="button" id="post">upload</button>
+        
+    </form>
 
     <!-- {% for ext, key in extdate %}
     <img id="{{key}}" src="/images/extention/{{ext}}.png" width="5%" height="5%">
 
 
     {% endfor %} -->
+
+    <script>
+        function updateProgress(e) {
+            if (e.lengthComputable) {
+                const percent = e.loaded / e.total;
+                $("progress").attr("value", percent * 100);
+            }
+
+        }
+        $("#post").on("click", function () {
+            let len = document.getElementById('file').files.length;
+            for(let i = 0 ; i < len ; i++){
+                var formData = new FormData();
+                formData.append("file", document.getElementById("file").files[i]);
+                var request = new XMLHttpRequest();
+                request.upload.addEventListener("progress", updateProgress, false);
+                request.open("POST", "/put?path={{putpath}}");
+                request.overrideMimeType('file; charset=UTF-8');
+                request.send(formData);
+                request.onerror = function () {
+                    alert("アップロードに失敗しました")
+                }
+            }
+            request.onload = function () {
+                    alert("アップロードが完了しました")
+                    location.reload()
+                }
+        });
+    </script>
     
     <a href="/">戻る</a><br>
     <a href="#" onclick="javascript:window.history.back(-1);return false;">Back</a>
